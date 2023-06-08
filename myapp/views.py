@@ -299,38 +299,78 @@ def destroyadmin(request, id):
 
 def reclamationSucc(request):
    return render(request,'reclamationSucc.html')
+
+from django.db.models import Sum, Count
 import json
+
 def acceuil(request):
-    # Get the ID of the current user
     user_id = request.user.id
-    # Filter the model objects by the user ID
+
     contacts = Contact.objects.filter(id_infopreneur_id=user_id)
-    tunnels=Post.objects.filter(id_infopreneur_id=user_id)
-    affilies=Affilie.objects.filter(id_infopreneur_id=user_id)
+    tunnels = Post.objects.filter(id_infopreneur_id=user_id)
+    affilies = Affilie.objects.filter(id_infopreneur_id=user_id)
     user = request.user
 
-    #Fetch the number of contacts for the authenticated user
     contact_count = user.contact_set.count()
-
-    # Fetch the number of affiliates for the authenticated user
     affiliate_count = user.affilie_set.count()
-
-    # Fetch the number of posts for the authenticated user
     post_count = user.post_set.count()
+
     contacts_list = list(contacts.values('Sexe'))
     contacts_json = json.dumps(contacts_list)
 
+    commandes = Commande.objects.all()
+
+    data = [
+        {
+            'date_commande': commande.date_commande.strftime('%Y-%m-%d'),
+            'montant_commande': commande.montant_commande
+        }
+        for commande in commandes
+    ]
+
+    top_clients = (
+    Commande.objects.filter(id_infopreneur_id=user_id)
+    .values('nom_client', 'prenom_client')
+    .annotate(count=Count('id'))
+    .order_by('-count')[:3]
+                )
+    
+
+
+    chiffre_affaires = commandes.aggregate(total_chiffre_affaires=Sum('montant_commande'))['total_chiffre_affaires'] or 0
+
+    male_clients = Commande.objects.filter(id_infopreneur_id=user_id, Sexe='homme')
+    female_clients = Commande.objects.filter(id_infopreneur_id=user_id, Sexe='femme')
+    other_clients = Commande.objects.filter(id_infopreneur_id=user_id, Sexe='autre')
+
+    male_clients_count = male_clients.count()
+    female_clients_count = female_clients.count()
+    other_clients_count = other_clients.count()
+
+
     context = {
+        'male_clients': male_clients,
+        'female_clients': female_clients,
+        'other_clients': other_clients,
+        'male_clients_count': male_clients_count,
+        'female_clients_count': female_clients_count,
+        'other_clients_count': other_clients_count,
         'contact_count': contact_count,
         'affiliate_count': affiliate_count,
         'post_count': post_count,
         'contacts': contacts,
-        'affilies':affilies,
-        'tunnels':tunnels,
+        'affilies': affilies,
+        'tunnels': tunnels,
         'contacts_json': contacts_json,
+        'commandes': commandes,
+        'data': data,
+        'top_clients': top_clients,
+        'chiffre_affaires': chiffre_affaires,
+        
     }
 
-    return render(request,'acceuil.html',context)
+    return render(request, 'acceuil.html', context)
+
 
 def homeadmin(request):
     utilisateurs=Utilisateur.objects.all()

@@ -143,13 +143,43 @@ p {
   z-index: 1;
   box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.2);
 }
+.carda{
+  
+  padding: 15px;
+ 
+  margin-left:2%;
+  align-items: center;
+  justify-content: center;
+  
+  background: rgb(255 255 255 / 10%);
+  border-top:1px solid rgba(255, 255, 255, 0.3);
+  border-left: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  z-index: 1;
+  box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.2);
+}
+.cardc{
+  
+  padding: 15px;
+ 
+  margin-left:2%;
+  align-items: center;
+  justify-content: center;
+  
+  background: rgb(255 255 255 / 10%);
+  border-top:1px solid rgba(255, 255, 255, 0.3);
+  border-left: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  z-index: 1;
+  box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.2);
+}
 h5{
   margin-bottom:2%;
   font-weight: 600;
   font-family: "Poppins", sans-serif;
 }
 .upper-section {
-  margin-left:8%;
+  margin-left:4%;
 display:flex; 
 }
 
@@ -288,19 +318,21 @@ display:flex;
         <div class="row align-items-stretch">
           <div class="c-dashboardInfo col-lg-3 col-md-6">
             <div class="wrap">
-              <h4 class="heading heading5 hind-font medium-font-weight c-dashboardInfo__title">Total des tunnels<svg
+              <h4 class="heading heading5 hind-font medium-font-weight c-dashboardInfo__title">Total Chiffre d'affaires <svg
                   class="MuiSvgIcon-root-19" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="presentation">
                   <path fill="none" d="M0 0h24v24H0z"></path>
-                 
+
                 </svg>
               </h4>
-              <div id="postCards" class="card-deck"></div>
+              <p>{{ chiffre_affaires }}</p>
             </div>
           </div>
-        
+
       </div>
+      
     </div>
   </div>
+  
     <script>
       var contactCounts = {{ contact_count|safe }};
       var affiliateCount = {{ affiliate_count|safe }};
@@ -359,162 +391,251 @@ display:flex;
       postCardsContainer.appendChild(cardDiv);
     </script>
   <div class="upper-section">
-    <div class="cardo " style="background-color:#f4eeff; width:30%; margin-top:3%;">
-    <center><h5>Nombre de tunnel selon la catégorie du produit</h5></center>
-  <canvas id="myChart2" class="content" ><canvas>
-  <script>
-    var ctx = document.getElementById('myChart2').getContext('2d');
-  
-    // Filter distinct categories
-    var distinctCategories = Array.from(new Set([{% for tunnel in tunnels %}'{{ tunnel.Categorie }}',{% endfor %}]));
-  
-    // Count number of tunnels for each category
-    var tunnelCounts = [];
-    for (var i = 0; i < distinctCategories.length; i++) {
-      var count = 0;
-      {% for tunnel in tunnels %}
-      if ('{{ tunnel.Categorie }}' === distinctCategories[i]) {
-        count++;
-      }
-      {% endfor %}
-      tunnelCounts.push(count);
-    }
-  
-    var myChart = new Chart(ctx, {
-      type: 'doughnut',
-      data: {
-        labels: distinctCategories,
-        datasets: [{
-          label: '# of Tunnels',
-          data: tunnelCounts,
-          backgroundColor: [
-                  
-          'rgba(75, 192, 192, 0.5)',
-          'rgba(153, 102, 255, 0.5)',
-          'rgba(255, 159, 64, 0.5)',
-          
-                ],
-      borderColor: [
-        
-          'rgba(75, 192, 192, 1)',
-          'rgba(153, 102, 255, 1)',
-          'rgba(255, 159, 64, 1)',
-          
-
-                ],
-          borderWidth: 1
-        }]
-      },
-      // Add any other chart options as needed
-    });
-  </script>
-   
-</div>
-  
-
-<div class="cardo " style="background-color:#f4eeff; width:30%; margin-top:3%;">
-  <center><h5>Nombre de contact selon les villes</h5></center>
-  <canvas id="myChart3" class="content"></canvas>
-  <script>
-    var ctx = document.getElementById('myChart3').getContext('2d');
-  
-    // Filter distinct categories
-    var distinctCategories = Array.from(new Set([{% for contact in contacts %}'{{ contact.categorie }}',{% endfor %}]));
-  
-    // Count number of tunnels for each category
-    var tunnelCounts = [];
-    for (var i = 0; i < distinctCategories.length; i++) {
-      var count = 0;
-      {% for contact in contacts %}
-      if ('{{ contact.categorie }}' === distinctCategories[i]) {
-        count++;
-      }
-      {% endfor %}
-      tunnelCounts.push(count);
-    }
-  
-    var myChart = new Chart(ctx, {
-      type: 'polarArea',
-      data: {
-        labels: distinctCategories,
-        datasets: [{
-          label: 'nombre de contact',
-          data: tunnelCounts,
-          backgroundColor: [
-          'rgba(255, 99, 132, 0.5)',
-          'rgba(54, 162, 235, 0.5)',
-          'rgba(255, 206, 86, 0.5)',
-          
-          'rgba(153, 102, 255, 0.5)',
-          'rgba(255, 159, 64, 0.5)',
-          'rgba(240, 120, 50, 0.5)',
-                ],
-          borderColor: [
-          'rgba(255, 99, 132, 1)',
-          'rgba(54, 162, 235, 1)',
-          'rgba(255, 206, 86, 1)',
-          
-          'rgba(153, 102, 255, 1)',
-          'rgba(255, 159, 64, 1)',
-          'rgba(240, 120, 50, 1)',
-
-                        ],
-          borderWidth: 1
-        }]
-      },
-      // Add any other chart options as needed
-    });
-  </script>
-</div>
-
-
-<div class="cardo " style="background-color:#f4eeff; width:30%; margin-top:3%;">
- 
-  <canvas id="doughnutChart" class="content"></canvas>
-  
-  <script>
-      var contacts = JSON.parse('{{ contacts_json | safe }}');
-  
-      // Count the number of each category
-      var femmeCount = 0;
-      var hommeCount = 0;
-      var autreCount = 0;
-      for (var i = 0; i < contacts.length; i++) {
-          if (contacts[i].Sexe === 'femme') {
-              femmeCount++;
-          } else if (contacts[i].Sexe === 'homme') {
-              hommeCount++;
-          } else if (contacts[i].Sexe === 'autre') {
-              autreCount++;
-          }
-      }
-  
-      // Calculate the percentage of each category
-      var total = femmeCount + hommeCount + autreCount;
-      var femmePercentage = (femmeCount / total) * 100;
-      var hommePercentage = (hommeCount / total) * 100;
-      var autrePercentage = (autreCount / total) * 100;
-  
-      // Create the doughnut chart
-      var doughnutChart = new Chart(document.getElementById('doughnutChart'), {
-          type: 'pie',
+    <div class="cardc" style="background-color:#f4eeff; width:35%; margin-top:3%;">
+      <center><h5>Les trois meilleurs clients</h5></center>
+      <canvas id="myChart" class="content"></canvas>
+      <script>
+        var ctx = document.getElementById('myChart').getContext('2d');
+    
+        /// Retrieve the top clients data
+        var topClients = [
+        {% for client in top_clients %}
+          {
+            nom_client: '{{ client.nom_client }}',
+            prenom_client: '{{ client.prenom_client }}',
+            count: {{ client.count }}
+          },
+        {% endfor %}
+        ];
+    
+        // Sort the top clients based on count in descending order
+        topClients.sort(function(a, b) {
+          return b.count - a.count;
+        });
+    
+        // Extract the top 3 client names and counts
+        var labels = [];
+        var clientCounts = [];
+        for (var i = 0; i < Math.min(topClients.length, 3); i++) {
+          var client = topClients[i];
+          var fullName = client.nom_client + ' ' + client.prenom_client;
+          labels.push(fullName);
+          clientCounts.push(client.count);
+        }
+    
+        var myChart = new Chart(ctx, {
+          type: 'bar',
           data: {
-              labels: ['Femme', 'Homme', 'Autre'],
-              datasets: [{
-                  data: [femmePercentage, hommePercentage , autrePercentage],
-                  backgroundColor: [
-          'rgba(255, 99, 132, 0.5)',
-          'rgba(54, 162, 235, 0.5)',
-          'rgba(255, 206, 86, 0.5)',
-                ],
-              }],
+            labels: labels,
+            datasets: [{
+              label: 'Top 3 Clients',
+              data: clientCounts,
+              backgroundColor: [
+                'rgba(255, 99, 132, 0.5)',
+                'rgba(54, 162, 235, 0.5)',
+                'rgba(255, 206, 86, 0.5)',
+              ],
+              borderColor: [
+                'rgba(255, 99, 132, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+              ],
+              borderWidth: 1
+            }]
           },
           options: {
-              responsive: true,
-              maintainAspectRatio: false,
+            indexAxis: 'y', // Specify the index axis as the y-axis
+            scales: {
+              y: {
+                beginAtZero: true,
+                precision: 0
+              },
+              x: {
+                beginAtZero: true
+              }
+            }
           }
+        });
+      </script>
+    </div>
+    
+    <div class="carda" style="background-color:#f4eeff; width:35%; margin-top:3%;">
+      <center><h5>Produits vendus</h5></center>
+      <select id="filterSelect">
+        <option value="day">Par jour</option>
+        <option value="week">Par semaine</option>
+        <option value="month">Par mois</option>
+        <option value="year">Par année</option>
+      </select>
+      <canvas id="myChart3" class="content"></canvas>
+    </div>
+    
+    <script>
+      var ctx2 = document.getElementById('myChart3').getContext('2d');
+      var filterSelect = document.getElementById('filterSelect');
+    
+      // Create an object to store the data
+      var dataByDate = {};
+    
+      // Iterate over the commandes data
+      {% for commande in commandes %}
+        {% if commande.id_infopreneur_id == user.id %}
+          var dateCommande = '{{ commande.date_commande|date:"Y-m-d" }}';
+          var nomProduit = '{{ commande.nom_produit }}';
+    
+          // Check if the dateCommande exists in the dataByDate object
+          if (dataByDate[dateCommande] === undefined) {
+            dataByDate[dateCommande] = [nomProduit];
+          } else {
+            dataByDate[dateCommande].push(nomProduit);
+          }
+        {% endif %}
+      {% endfor %}
+    
+      // Function to filter the data based on the selected option
+      function filterData(option) {
+        var filteredData = {};
+    
+        // Iterate over the dataByDate object
+        for (var date in dataByDate) {
+          var currentDate = new Date(date);
+          var currentYear = currentDate.getFullYear();
+          var currentMonth = currentDate.getMonth() + 1;
+          var currentWeek = getWeekNumber(currentDate);
+    
+          if (option === 'day') {
+            filteredData[date] = dataByDate[date];
+          } else if (option === 'week') {
+            var weekKey = currentYear + '-W' + currentWeek;
+            if (filteredData[weekKey] === undefined) {
+              filteredData[weekKey] = dataByDate[date];
+            } else {
+              filteredData[weekKey] = filteredData[weekKey].concat(dataByDate[date]);
+            }
+          } else if (option === 'month') {
+            var monthKey = currentYear + '-' + currentMonth;
+            if (filteredData[monthKey] === undefined) {
+              filteredData[monthKey] = dataByDate[date];
+            } else {
+              filteredData[monthKey] = filteredData[monthKey].concat(dataByDate[date]);
+            }
+          } else if (option === 'year') {
+            var yearKey = currentYear;
+            if (filteredData[yearKey] === undefined) {
+              filteredData[yearKey] = dataByDate[date];
+            } else {
+              filteredData[yearKey] = filteredData[yearKey].concat(dataByDate[date]);
+            }
+          }
+        }
+    
+        // Extract the dates and products as labels and data respectively
+        var labels = Object.keys(filteredData);
+        var data = Object.values(filteredData).map(function(products) {
+          return products.length;
+        });
+    
+        // Update the chart data
+        myChart3.data.labels = labels;
+        myChart3.data.datasets[0].data = data;
+        myChart3.update();
+      }
+    
+      // Event listener for the filter select
+      filterSelect.addEventListener('change', function() {
+        var selectedOption = this.value;
+        filterData(selectedOption);
+      });
+    
+      // Function to get the week number of a date
+      function getWeekNumber(date) {
+        var onejan = new Date(date.getFullYear(), 0, 1);
+        return Math.ceil(((date - onejan) / 86400000 + onejan.getDay() + 1) / 7);
+      }
+    
+      // Initialize the chart
+      var myChart3 = new Chart(ctx2, {
+        type: 'bar',
+        data: {
+          labels: [],
+          datasets: [{
+            label: 'Produits vendus',
+            data: [],
+            backgroundColor: [
+            'rgba(255, 99, 132, 0.5)',
+            'rgba(54, 162, 235, 0.5)',
+            'rgba(255, 206, 86, 0.5)',
+            'rgba(153, 102, 255, 0.5)',
+            'rgba(255, 159, 64, 0.5)',
+            'rgba(240, 120, 50, 0.5)',
+          ],
+          borderColor: [
+            'rgba(255, 99, 132, 1)',
+            'rgba(54, 162, 235, 1)',
+            'rgba(255, 206, 86, 1)',
+            'rgba(153, 102, 255, 1)',
+            'rgba(255, 159, 64, 1)',
+            'rgba(240, 120, 50, 1)',
+          ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true,
+              precision: 0
+            }
+          }
+        }
+      });
+    
+      // Filter the data based on the initial selected option
+      var initialOption = filterSelect.value;
+      filterData(initialOption);
+    </script>
+    
+    
+
+
+<div class="cardo " style="background-color:#f4eeff; width:20%; margin-top:3%;">
+  <center><h5>
+    Vue d'ensemble genrée de notre clientèle
+    </h5></center>
+  <canvas id="clientChart"></canvas>
+  
+  <script>
+      document.addEventListener('DOMContentLoaded', function () {
+          var maleClientsCount = {{ male_clients_count }};
+          var femaleClientsCount = {{ female_clients_count }};
+          var otherClientsCount = {{ other_clients_count }};
+
+          var ctx = document.getElementById('clientChart').getContext('2d');
+          var clientChart = new Chart(ctx, {
+              type: 'pie',
+              data: {
+                  labels: ['Homme', 'Femme'],
+                  datasets: [{
+                      label: 'Client Gender Distribution',
+                      data: [maleClientsCount, femaleClientsCount, otherClientsCount],
+                      backgroundColor: [
+                      'rgba(255, 206, 86, 0.5)',
+                      'rgba(153, 102, 255, 0.5)',
+                          'rgba(75, 192, 192, 0.5)'
+                      ],
+                      borderColor: [
+                      'rgba(255, 206, 86, 1)',
+                      'rgba(153, 102, 255, 1)',
+                          'rgba(75, 192, 192, 1)'
+                      ],
+                      borderWidth: 1
+                  }]
+              },
+             
+          });
       });
   </script>
+
   
 </div>
 </div>

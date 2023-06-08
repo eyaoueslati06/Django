@@ -267,3 +267,25 @@ class Page(models.Model):
             content = ContentFile(response.content)
             self.html_file.save(file_name, content, save=True)
 
+class Commande(models.Model):
+    num_commande=models.IntegerField(null=True)
+    date_commande=models.DateField(null=True)
+    nom_client= models.CharField(max_length=35, null=True)
+    prenom_client= models.CharField(max_length=25, null=True)
+    ville=models.CharField(max_length=256, null=True)
+    montant_commande=models.DecimalField(max_digits=6, decimal_places=2, null=True)
+    ugs = models.CharField(max_length=256, null=True) 
+    id_produit=models.IntegerField(null=True)
+    nom_produit=models.CharField(max_length=256, null=True)
+    categorie=models.CharField(max_length=500, null=True)
+    prix_produit=models.DecimalField(max_digits=6, decimal_places=2, null=True)
+    description_produit=models.CharField(max_length=500)
+    id_infopreneur =models.ForeignKey(User,on_delete=models.CASCADE,default=0)
+    sexe_type = (
+        ('femme', 'Femme'),
+        ('homme', 'Homme'),
+        ('autre', 'Autre'),
+    )
+    Sexe = models.CharField(max_length=30, choices=sexe_type, default='homme', null=True)
+    
+

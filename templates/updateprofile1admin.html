@@ -27,7 +27,7 @@
         content: "";
         height: 100%;
         width: 100%;
-        background: linear-gradient(45deg, #655add, #d84b87);
+        background: linear-gradient(45deg, #4FC3A1, #324960);
         clip-path: circle(25% at right 5%);
       }
       
@@ -38,7 +38,7 @@
         content: "";
         height: 100%;
         width: 100%;
-        background: linear-gradient(#c14e993b, #90654b4f);
+        background: linear-gradient(#324960,#4FC3A1);
         clip-path: circle(20% at left 95%);
       }
       
@@ -92,7 +92,7 @@
       /* Buttons */
       .card button {
         width: 60%;
-        background: #ee0979;
+        background: #4FC3A1;
         color: white;
         border: 0 none;
         border-radius: 25px;
@@ -121,6 +121,8 @@
         font-size: 15px;
         color: black
       ;
+      margin-top:10px;
+      margin-left:10px;
       margin-bottom: 2px;
       }
       
@@ -208,6 +210,9 @@
       h3 {
       margin: 3% 15%;
       }
+      .form-group{
+        display:flex;
+      }
         
             </style>
           
@@ -232,12 +237,11 @@
         <input type="text" id="id_username" name="username" class="form-control" placeholder="Nom d'utilisateur" value="{{ user.username}}">
 
       </div> 
+      
       <div class="form-group">
         <label>Nom:</label>  
         <input type="text" id="id_last_name" name="last_name" class="form-control" placeholder="Nom" value="{{ user.last_name}}">
 
-      </div> 
-      <div class="form-group">
         <label>Prénom:</label>  
         <input type="text" id="id_first_name" name="first_name" class="form-control" placeholder="Prénom" value="{{ user.first_name}}">
       </div> 
