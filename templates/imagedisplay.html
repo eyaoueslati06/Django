@@ -403,73 +403,127 @@
     </style>
 </head>
 <body>
-    <h3>Etape 3: Partager le lien de votre Tunnel</h3>
-    <div class="left">
+  <h3>Etape 3: Partager le lien de votre Tunnel</h3>
+  <div class="left">
     <img src="/media/image.png">
-    </div>
-    <div class="right">
+    
+  </div>
+  
+  <div class="right">
     {% if image_url %}
     <h2>URL du Tunnel crée:</h2> 
     <p>{{ image_url }}</p>
-    <button onclick="copyURL()">Copy URL</button>
-
-    <section class="trial-block shadow3" id="ContactUs">
-        <div class="height450">
-           <div class="section-title text-center">
-              <span class="badge badge-info">Vous pouvez aussi partagez Sur :</span>
-              
-              <span class="section-title-line section-title-line"></span>
-           </div>
-            <div class="social-overlap process-scetion mt100">
-             <div class="container">
-                 <div class="row justify-content-center">
-                     <div class="col-md-10">
-                         <div class="social-bar">
-                             <div class="social-icons mb-3 iconpad text-center">
-
-                                <a href="https://www.google.com/intl/fr/gmail/about/" target="_blank" class="slider-nav-item"><i class='bx bxl-gmail' style='color:#e82a2a'  ></i></a>
-                                 <a href="https://twitter.com/?lang=fr" target="_blank" class="slider-nav-item"><i class='bx bxl-twitter' ></i></a>
-                                 <a href="https://fr-fr.facebook.com/" target="_blank" class="slider-nav-item"><i class='bx bxl-facebook-circle'></i></a>
-                                 <a href="https://www.instagram.com/" target="_blank" class="slider-nav-item"><i class='bx bxl-instagram' style='color:#f32cd0'  ></i></i></a>
-                                 <a href="https://fr.linkedin.com/" target="_blank" class="slider-nav-item"><i class='bx bxl-linkedin-square' ></i></i></a>
-
-
-                             </div>
-                         </div>
-                     </div>
-                 </div>
+    <button onclick="copyURL()">Copier le lien</button>
+    <button onclick="shareImage()">Partager le tunnel</button>
+    <div class="social-icons">
+      <section class="trial-block shadow3" id="ContactUs">
+          <div class="height450">
+             <div class="section-title text-center">
+                <span class="badge badge-info">Vous pouvez maintenant partager sur :</span>
+                
+                <span class="section-title-line section-title-line"></span>
              </div>
-         </div>
-        </div> 
-</section>
-{% else %}
+              <div class="social-overlap process-scetion mt100">
+               <div class="container">
+                   <div class="row justify-content-center">
+                       <div class="col-md-10">
+                           <div class="social-bar">
+                               <div class="social-icons mb-3 iconpad text-center">
+      
+                                  <a href="https://www.google.com/intl/fr/gmail/about/" target="_blank" class="slider-nav-item"><i class='bx bxl-gmail' style='color:#e82a2a'  ></i></a>
+                                   <a href="https://twitter.com/?lang=fr" target="_blank" class="slider-nav-item"><i class='bx bxl-twitter' ></i></a>
+                                   <a href="https://fr-fr.facebook.com/" target="_blank" class="slider-nav-item"><i class='bx bxl-facebook-circle'></i></a>
+                                   <a href="https://www.instagram.com/" target="_blank" class="slider-nav-item"><i class='bx bxl-instagram' style='color:#f32cd0'  ></i></i></a>
+                                   <a href="https://fr.linkedin.com/" target="_blank" class="slider-nav-item"><i class='bx bxl-linkedin-square' ></i></i></a>
+      
+      
+                               </div>
+                           </div>
+                       </div>
+                   </div>
+               </div>
+           </div>
+          </div> 
+      </section>
+  </div>
+    {% else %}
     <p>Error_404</p>
-{% endif %}
-    </div>
+    {% endif %}
+  </div>
 
-    <script>
-      function copyURL() {
-        // Create a temporary input element
-        var tempInput = document.createElement("input");
-        
-        // Assign the generated URL to the input's value
-        tempInput.value = "{{ image_url }}";
-        
-        // Append the input element to the document
-        document.body.appendChild(tempInput);
-        
-        // Select the input's content
-        tempInput.select();
-        
-        // Copy the selected content to the clipboard
-        document.execCommand("copy");
-        
-        // Remove the temporary input element
-        document.body.removeChild(tempInput);
-        
-        // Alert the user that the URL has been copied
-        alert("URL copied to clipboard!");
-      }
-      </script>
+  <script>
+    function copyURL() {
+      // Get the URL text
+      var urlText = "{{ image_url }}";
+
+      // Create a temporary input element
+      var tempInput = document.createElement("input");
+
+      // Assign the URL text to the input's value
+      tempInput.value = urlText;
+
+      // Append the input element to the document
+      document.body.appendChild(tempInput);
+
+      // Select the input's content
+      tempInput.select();
+
+      // Copy the selected content to the clipboard
+      document.execCommand("copy");
+
+      // Remove the temporary input element
+      document.body.removeChild(tempInput);
+
+      // Alert the user that the URL has been copied
+      alert(" Lien copié avec success! ");
+    }
+    function shareImage() {
+      // Capture the image
+      var canvas = document.createElement("canvas");
+      var image = document.querySelector(".left img");
+
+      canvas.width = image.naturalWidth;
+      canvas.height = image.naturalHeight;
+
+      var ctx = canvas.getContext("2d");
+      ctx.drawImage(image, 0, 0, image.naturalWidth, image.naturalHeight);
+  
+      // Convert the captured image to a data URL
+      var dataURL = canvas.toDataURL();
+  
+      // Remove the "data:image/png;base64," prefix from the data URL
+      var imageData = dataURL.replace(/^data:image\/(png|jpg|jpeg);base64,/, "");
+      
+      // Copy the image data to the clipboard
+      navigator.clipboard.writeText(dataURL)
+        .then(function() {
+          // Alert the user that the image has been copied
+          alert("Image copiè avec succès! Vous pouvez maintenant la partager dans vos réseaux sociaux.");
+          
+          // Create a form dynamically
+          var form = document.createElement("form");
+          form.method = "post";
+           // Updated with a trailing slash
+      
+          // Create an input field for the image data
+          var imageInput = document.createElement("input");
+          imageInput.type = "hidden";
+          imageInput.name = "image_data";
+          imageInput.value = imageData;
+      
+          // Append the input field to the form
+          form.appendChild(imageInput);
+      
+          // Append the form to the document and submit it
+          document.body.appendChild(form);
+          form.submit();
+        })
+        .catch(function() {
+          // Handle any errors
+          alert("Failed to copy the image. Please copy and paste manually.");
+        });
+    }
+  </script>
 </body>
+
 </html>

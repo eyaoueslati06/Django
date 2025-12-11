@@ -289,7 +289,7 @@ display:flex;
         <div class="row align-items-stretch">
         <div class="c-dashboardInfo col-lg-3 col-md-6">
             <div class="wrap">
-              <h4 class="heading heading5 hind-font medium-font-weight c-dashboardInfo__title">Total des contacts<svg
+              <h4 class="heading heading5 hind-font medium-font-weight c-dashboardInfo__title">Nombre de contacts<svg
                   class="MuiSvgIcon-root-19" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="presentation">
                   <path fill="none" d="M0 0h24v24H0z"></path> 
               </h4>
@@ -303,7 +303,7 @@ display:flex;
         <div class="row align-items-stretch">
           <div class="c-dashboardInfo col-lg-3 col-md-6">
             <div class="wrap">
-              <h4  class="heading heading5 hind-font medium-font-weight c-dashboardInfo__title">Total des affiliés<svg
+              <h4  class="heading heading5 hind-font medium-font-weight c-dashboardInfo__title">Nombre d'affiliés<svg
                   class="MuiSvgIcon-root-19" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="presentation">
                   <path fill="none" d="M0 0h24v24H0z"></path>
     
@@ -318,22 +318,53 @@ display:flex;
         <div class="row align-items-stretch">
           <div class="c-dashboardInfo col-lg-3 col-md-6">
             <div class="wrap">
-              <h4 class="heading heading5 hind-font medium-font-weight c-dashboardInfo__title">Total Chiffre d'affaires <svg
+              <h4 class="heading heading5 hind-font medium-font-weight c-dashboardInfo__title">Chiffre d'affaires <svg
                   class="MuiSvgIcon-root-19" focusable="false" viewBox="0 0 24 24" aria-hidden="true" role="presentation">
                   <path fill="none" d="M0 0h24v24H0z"></path>
-
                 </svg>
               </h4>
-              <p>{{ chiffre_affaires }}</p>
+              
+              <select id="currency-select">
+                <option value="TND" selected>Dinars Tunisien</option>
+                <option value="EUR">Euros</option>
+                <option value="USD">Dollars</option>
+              </select>
+              
+              <p id="chiffre-affaires"></p>
             </div>
           </div>
-
+        </div>
       </div>
+      
       
     </div>
   </div>
   
     <script>
+      const select = document.getElementById("currency-select");
+const chiffreAffaires = document.getElementById("chiffre-affaires");
+const chiffreAffairesDT = "{{ chiffre_affaires }}";
+const chiffreAffairesEuros = "{{ chiffre_affaires_euros }}";
+const chiffreAffairesDollars = "{{ chiffre_affaires_dollars }}";
+
+// Set the default selected option to TND
+select.value = "TND";
+
+// Update chiffreAffaires element with the value for TND
+chiffreAffaires.textContent = chiffreAffairesDT + " DT";
+
+select.addEventListener("change", function() {
+  const selectedCurrency = select.value;
+
+  if (selectedCurrency === "TND") {
+    chiffreAffaires.textContent = chiffreAffairesDT + " DT";
+  } else if (selectedCurrency === "EUR") {
+    chiffreAffaires.textContent = chiffreAffairesEuros + " Euros";
+  } else if (selectedCurrency === "USD") {
+    chiffreAffaires.textContent = chiffreAffairesDollars + " Dollars";
+  }
+});
+
       var contactCounts = {{ contact_count|safe }};
       var affiliateCount = {{ affiliate_count|safe }};
       var postCount = {{ post_count|safe }};
@@ -600,7 +631,7 @@ display:flex;
 
 <div class="cardo " style="background-color:#f4eeff; width:20%; margin-top:3%;">
   <center><h5>
-    Vue d'ensemble genrée de notre clientèle
+    Vue d'ensemble par genre
     </h5></center>
   <canvas id="clientChart"></canvas>
   

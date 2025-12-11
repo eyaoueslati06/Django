@@ -33,16 +33,6 @@ from .forms import ContactForm
 from nbconvert import HTMLExporter
 import nbformat
 from rest_framework_simplejwt.tokens import RefreshToken
-def notebook_view(request):
-    with open('chatbot/ChatbotApp.py') as f:
-        code = f.read()
-    notebook = nbformat.reads(code, asversion=4)
-    exporter = HTMLExporter()
-    html,  = exporter.from_notebook_node(notebook)
-
-    return render(request, 'notebook.html', {'html': html})
-
-# Create your views here.
 import requests
 from django.core.files.base import ContentFile
 from django.shortcuts import render
@@ -55,6 +45,21 @@ from django.conf import settings
 from django.http import HttpResponseServerError
 from django.http import HttpResponseBadRequest
 from django.db.models import Count
+from django.db.models import Sum, Count
+import json
+from decimal import Decimal
+from datetime import datetime, timedelta
+from django.db.models import F
+
+def notebook_view(request):
+    with open('chatbot/ChatbotApp.py') as f:
+        code = f.read()
+    notebook = nbformat.reads(code, asversion=4)
+    exporter = HTMLExporter()
+    html,  = exporter.from_notebook_node(notebook)
+
+    return render(request, 'notebook.html', {'html': html})
+
 @csrf_exempt
 def save_image(request):
     if request.method == 'POST':
@@ -81,22 +86,8 @@ def imagedisplay(request):
             image_url = request.build_absolute_uri(settings.MEDIA_URL + 'image.png')
     except IOError:
         pass
-    return render(request, 'imagedisplay.html', {'image_url': image_url})      
-        
-
-
-def download_page(request, page_id):
-    # Récupérer l'instance de la page
-    page = Page.objects.get(id=page_id)
-    
-    # Télécharger le contenu HTML de la page
-    response = requests.get(page.url)
-    if response.status_code == 200:
-        file_name = page.url.split('/')[-1]
-        content = ContentFile(response.content)
-        page.html_file.save(file_name, content, save=True)
-        
-    return render(request, 'page.html', {'page': page})
+    return render(request, 'imagedisplay.html', {'image_url': image_url})   
+ 
 
 class SignupView(View):
 
@@ -129,11 +120,6 @@ class SignupView(View):
         
         messages.success(request, "Signup successful!")
         return redirect('/adminDashboard')
-
-
-
-
-
 
 
 logger = logging.getLogger(__name__)
@@ -297,11 +283,6 @@ def destroyadmin(request, id):
     template.delete()  
     return redirect("/rec_admin") 
 
-def reclamationSucc(request):
-   return render(request,'reclamationSucc.html')
-
-from django.db.models import Sum, Count
-import json
 
 def acceuil(request):
     user_id = request.user.id
@@ -346,6 +327,24 @@ def acceuil(request):
     male_clients_count = male_clients.count()
     female_clients_count = female_clients.count()
     other_clients_count = other_clients.count()
+    def convert_currency(amount, base_currency, target_currency):
+        # Make API request to get the latest exchange rates
+        response = requests.get(f"https://api.exchangerate-api.com/v4/latest/{base_currency}")
+
+        if response.status_code == 200:
+            data = response.json()
+            rates = data.get("rates")
+            if rates:
+                conversion_rate = rates.get(target_currency)
+                if conversion_rate:
+                    converted_amount = Decimal(amount) * Decimal(str(conversion_rate))
+                    return converted_amount
+
+        return None
+
+    chiffre_affaires_euros = convert_currency(chiffre_affaires, "TND", "EUR")
+    chiffre_affaires_dollars = convert_currency(chiffre_affaires, "TND", "USD")
+
 
 
     context = {
@@ -366,6 +365,8 @@ def acceuil(request):
         'data': data,
         'top_clients': top_clients,
         'chiffre_affaires': chiffre_affaires,
+        'chiffre_affaires_euros': chiffre_affaires_euros,
+        'chiffre_affaires_dollars': chiffre_affaires_dollars,
         
     }
 
@@ -399,8 +400,6 @@ def homeadmin(request):
     }
     return render(request,'homeadmin.html',context)
 
-def template(request):
-   return render(request,'template.html')
 
 def landingpage(request):
     # Get the ID of the current user
@@ -434,6 +433,10 @@ def preview(request):
     else:
         form = PostForm()
     return render(request, 'preview.html', {'form': form})
+
+def template1(request, id):  
+    post = Post.objects.get(id=id)      
+    return render(request,'template1.html', {'post':post}) 
 def preview2(request):
     
     if request.method == 'POST':
@@ -454,34 +457,12 @@ def preview2(request):
     else:
         form = PostForm()
     return render(request, 'preview2.html', {'form': form})
-def template1(request, id):  
-    post = Post.objects.get(id=id)      
-    return render(request,'template1.html', {'post':post})  
 
 def template2(request, id):  
     post = Post.objects.get(id=id)     
     return render(request,'template2.html', {'post':post}) 
 
-def previewtemplate(request, id):
-    template = TemplatesCommuns.objects.get(id=id)
-    context = {'template': template}
-    return render(request, 'previewtemplate.html', context)
 
-
-def sharelandingpage(request):
-   return render(request,'sharelandingpage.html')
-
-def share(request, id):  
-    tc = TemplatesCommuns.objects.get(id=id)  
-    form = ShareForm(request.POST)  
-    if form.is_valid():  
-        form.save()  
-        return redirect("/landingpage")  
-    return render(request, 'sharelandingpage.html', {'tc':tc}) 
-
-
-
-from datetime import datetime, timedelta
 
 def profile(request, user_id):
     utilisateur = Utilisateur.objects.get(user_id=user_id)
@@ -523,19 +504,7 @@ def profiladmin(request, user_id):
     context = {'utilisateur': utilisateur, 'user_id': user_id, 'date_joined_formatted': date_joined_formatted, 'countdown_date': countdown_date}
     return render(request, 'profiladmin.html', context)
 
-def updatep(request, id):  
-    utilisateur =Utilisateur.objects.get(id=id)  
-    form = UtilisateurForm(request.POST, instance = utilisateur)  
-    user =User.objects.get(id=id)  
-    formm = UserForm(request.POST, instance = user) 
-    if form.is_valid() and formm.is_valid():  
-        form.save() 
-        formm.save() 
-        messages.success(request,"Donnees mis a jours avec Success !  ") 
-        return redirect("/acceuil") 
-    return render(request, 'profil.html', {'utilisateur':utilisateur}, {'user':user}) 
 
-from datetime import datetime
 
 @login_required
 def updateprofile1(request, utilisateur_id):
@@ -622,99 +591,10 @@ def updateprofile1admin(request, utilisateur_id):
 
     return render(request, 'updateprofile1admin.html', {'utilisateur_id': utilisateur_id, 'utilisateur': utilisateur})
 
-
-def update_profile(request, user_id):
-    # Retrieve the utilisateur object or return 404 error if not found
-    utilisateur = get_object_or_404(Utilisateur, user_id=user_id)
-
-    # Populate the form with existing data
-    if request.method == 'POST':
-        user_form = UserUpdateForm(request.POST, instance=request.user)
-        profile_form = UserProfileForm(request.POST, request.FILES, instance=utilisateur)
-
-        if user_form.is_valid() and profile_form.is_valid():
-            # Check which fields have changed
-            user_has_changed = any(field in user_form.changed_data for field in ['username', 'first_name', 'last_name', 'email'])
-            utilisateur_has_changed = any(field in profile_form.changed_data for field in ['Address', 'City', 'Country', 'postal_code', 'about_me', 'phonenumber', 'date_naissance'])
-
-            # Save the forms only if changes were made
-            if user_has_changed:
-                user_form.save()
-            if utilisateur_has_changed:
-                profile = profile_form.save(commit=False)
-                if 'avatar' in request.FILES:
-                    profile.avatar = request.FILES['avatar']
-                profile.save()
-                
-              # Return a response
-               # return HttpResponse('Votre profil a ete mis a jours avec succes.')
-            
-            return redirect('profile', user_id=user_id)
-        else:
-            print('Profile form errors:', profile_form.errors)
-            print('User form errors:', user_form.errors)
-
-    else:
-        user_form = UserUpdateForm(instance=request.user)
-        profile_form = UserProfileForm(instance=utilisateur)
-
-    return render(request, 'profile.html', {'user_form': user_form, 'profile_form': profile_form, 'utilisateur': utilisateur})
-
-
-def update_profiladmin(request, user_id):
-    # Retrieve the utilisateur object or return 404 error if not found
-    utilisateur = get_object_or_404(Utilisateur, user_id=user_id)
-    
-    # Populate the form with existing data
-    if request.method == 'POST':
-        user_form = UserUpdateForm(request.POST, instance=request.user)
-        profile_form = AdminProfileForm(request.POST, request.FILES, instance=utilisateur)
-
-        if user_form.is_valid() and profile_form.is_valid():
-            # Check which fields have changed
-            user_has_changed = any(field in user_form.changed_data for field in ['username', 'first_name', 'last_name', 'email'])
-            utilisateur_has_changed = any(field in profile_form.changed_data for field in ['phonenumber'])
-
-            # Save the forms only if changes were made
-            if user_has_changed:
-                user_form.save()
-            if utilisateur_has_changed:
-                profile = profile_form.save(commit=False)
-                if 'avatar' in request.FILES:
-                    profile.avatar = request.FILES['avatar']
-                profile.save()
-
-            return redirect('profiladmin', user_id=user_id)
-        else:
-            print('Profile form errors:', profile_form.errors)
-            print('User form errors:', user_form.errors)
-
-    else:
-        user_form = UserUpdateForm(instance=request.user)
-        profile_form = AdminProfileForm(instance=utilisateur)
-
-    return render(request, 'profiladmin.html', {'user_form': user_form, 'profile_form': profile_form, 'utilisateur': utilisateur})
-   
-
-
-
-def landinguser(request):
-    landingusers = TemplatesUser.objects.all()  
-    return render(request,"landinguser.html",{'landingusers':landingusers}) 
-
-
+ 
 def formpop(request):
     formpops = FormPopUp.objects.all()  
     return render(request,"formpop.html",{'formpops':formpops}) 
-def previewform(request, id):
-    formpops = FormPopUp.objects.get(id=id)  
-    return render(request,"previewform.html",{'formpops':formpops})
- 
-def destroylanding(request, id):  
-    landinguser = TemplatesUser.objects.get(id=id)  
-    landinguser.delete()  
-    return redirect("/landinguser")  
-
 
 
 def user_list(request):
@@ -749,16 +629,7 @@ def update_user(request, user_id):
         
     return render(request, 'user_update.html', {'user_form': user_form, 'utilisateur_form': utilisateur_form})
 
-
-
-def templates_communs(request):
-    templates = TemplatesCommuns.objects.all()
-    context = {
-        'templates': templates
-    }
-    print("inside templates now")
-    return render(request, 'user_templates.html', context)
-
+#liste des templates admin
 def pop_admin(request):
     templates = FormPopUp.objects.all()
     context = {
@@ -766,7 +637,7 @@ def pop_admin(request):
     }
     return render(request, 'pop_admin.html', context)
 
-from django.db.models import F
+#liste des recs pour l'admin
 def rec_admin(request):
     sort_by = request.GET.get('sort_by', 'submitted_at')  # Get the sorting parameter from the request query parameters, defaulting to 'date_submitted'
     templates = ContactFormSubmission.objects.all().order_by(F(sort_by).desc())  # Sort the objects based on the selected parameter
@@ -776,21 +647,7 @@ def rec_admin(request):
     }
     return render(request, 'rec_admin.html', context)
 
-
-
-
-def template_create(request):
-    if request.method == 'POST':
-        form = TemplatesCreateForm(request.POST, request.FILES)
-        if form.is_valid():
-            template = form.save(commit=False)
-            template.id = None
-            template.save()
-            return redirect('user_templates')
-    else:
-        form = TemplatesCreateForm()
-    return render(request, 'template_create.html', {'form': form})
-
+#admin creer nouvelle template
 def pop_create(request):
     if request.method == 'POST':
         form = PopCreateForm(request.POST, request.FILES)
@@ -803,53 +660,12 @@ def pop_create(request):
         form = PopCreateForm()
     return render(request, 'pop_template.html', {'form': form})
 
-def template_delete(request, id):
-    template = TemplatesCommuns.objects.get(id=id)
-    template.delete()
-    return redirect('user_templates')
 
+#delete template admin
 def pop_delete(request, id):
     template = FormPopUp.objects.get(id=id)
     template.delete()
     return redirect('pop_admin')
-
-def template_update(request, id):
-    template = get_object_or_404(TemplatesCommuns, id=id)
-    if request.method == 'POST':
-        templates_form = TemplatesUpdateForm(request.POST, instance=template)
-        if templates_form.is_valid():
-            templates_form.save()
-            return redirect('user_templates')
-    else:  # move this else block outside the if block
-        templates_form = TemplatesUpdateForm(instance=template)
-    return render(request, 'template_update.html', {'templates_form': templates_form})
-
-def pop_update(request, id):
-    template = get_object_or_404(FormPopUp, id=id)
-    if request.method == 'POST':
-        templates_form = PopUpdateForm(request.POST, instance=template)
-        if templates_form.is_valid():
-            templates_form.save()
-            return redirect('homeadmin')
-    else:  # move this else block outside the if block
-        templates_form = PopUpdateForm(instance=template)
-    return render(request, 'pop_update.html', {'templates_form': templates_form})
-
-def contact_view(request):
-    if request.method == 'POST':
-        form = GoogleDocs(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            
-    else:
-        form = GoogleDocs()
-
-    context = {
-        'form': form,
-    }
-
-    return render(request, 'contact_form.html', context)
-
 
 @login_required
 def delete_profile(request):
@@ -858,17 +674,6 @@ def delete_profile(request):
         logout(request)
         return redirect('home')
     return render(request, 'delete_profile.html')
-
-class ResetPasswordView(SuccessMessageMixin, PasswordResetView):
-    template_name = 'password_reset.html'
-    email_template_name = 'password_reset_email.html'
-    subject_template_name = 'password_reset_subject.html'
-    success_message = "We've emailed you instructions for setting your password, " \
-                      "if an account exists with the email you entered. You should receive them shortly." \
-                      " If you don't receive an email, " \
-                      "please make sure you've entered the address you registered with, and check your spam folder."
-    success_url = reverse_lazy('acceuil')
-
 
 class ChangePasswordView(SuccessMessageMixin, PasswordChangeView):
     template_name = 'change_password.html'
@@ -879,53 +684,3 @@ class ChangePasswordViewAdmin(SuccessMessageMixin, PasswordChangeView):
     template_name = 'change_passwordadmin.html'
     success_message = "Mot de passe changé"
     success_url = reverse_lazy('profiladmin')
-
-def share_template(request, id):
-    template = get_object_or_404(TemplatesCommuns, pk=id)
-
-    if request.method == 'POST':
-        form = EmailForm(request.POST)
-        if form.is_valid():
-            email = form.cleaned_data['email']
-            context = {
-                'title': template.title,
-                'content': template.content,
-            }
-            message = get_template('share_template_email.html').render(context)
-            send_mail(
-                'Sharing Template',
-                message,
-                'noreply@myapp.com',
-                [email],
-                fail_silently=False,
-            )
-            return redirect('share_success')
-    else:
-
-        form = EmailForm()
-
-    return render(request, 'share_template.html', {'form': form, 'template': template})
-
-def send_email(request):
-    if request.method == 'POST':
-        email = request.POST.get('email')
-        # Save the email to the Contact model
-        contact = Contact(email=email)
-        contact.save()
-    return redirect('home')
-
-def template_view(request, id):
-    template = get_object_or_404(TemplatesCommuns, id=id)
-    if request.method == 'POST':
-        email = request.POST['email']
-        # save the email to the database or do something else with it
-        return render(request, 'template_success.html')
-    return render(request, 'template.html', {'template': template})
-
-def generate_link(request):
-    # Generate your link here
-    link = 'http://example.com/link'
-    
-    # Render a template that displays the link
-    return render(request, 'generate_link.html', {'link': link})
-
